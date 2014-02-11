@@ -1,0 +1,2 @@
+sphinxcontrib-napoleon
+watson-http == 1.0.2
