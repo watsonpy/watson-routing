@@ -157,6 +157,17 @@ class ChoiceRouter(BaseRouter):
     def __init__(self, *routers):
         self.routers = routers
 
+    def add_route(self, route):
+        raise NotImplementedError('Not used in a ChoiceRouter')
+
+    def add_definition(self, definition):
+        raise NotImplementedError('Not used in a ChoiceRouter')
+
+    def add_router(self, router):
+        """Adds another router type to be able to search through.
+        """
+        self.routers.append(router)
+
     def matches(self, request):
         """Match a request against all the routes.
 
@@ -216,7 +227,8 @@ class ChoiceRouter(BaseRouter):
 
     def __iter__(self):
         for router in self.routers:
-            yield router
+            if router:
+                yield router
 
     def __repr__(self):
         return (
@@ -232,8 +244,8 @@ class ListRouter(BaseRouter):
     Priority will automatically be assigned based upon the order of the route
     definitions in the list.
     """
-    def __init__(self, routes=None, route_types=None):
-        super(ListRouter, self).__init__(routes, route_types)
+    def __init__(self, routes=None, build_strategies=None):
+        super(ListRouter, self).__init__(routes, build_strategies)
         if not routes:
             routes = []
         for priority, route_definition in enumerate(routes):
@@ -248,8 +260,8 @@ class ListRouter(BaseRouter):
 class DictRouter(BaseRouter):
     """Create routes from a dictionary of route definitions.
     """
-    def __init__(self, routes=None, route_types=None):
-        super(DictRouter, self).__init__(routes, route_types)
+    def __init__(self, routes=None, build_strategies=None):
+        super(DictRouter, self).__init__(routes, build_strategies)
         if not routes:
             routes = {}
         for name, route_definition in routes.items():
