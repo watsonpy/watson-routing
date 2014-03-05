@@ -102,10 +102,21 @@ class TestListRouter(object):
 
 
 class TestChoiceRouter(object):
+
+    def test_invalid(self):
+        router = routers.ChoiceRouter()
+        with raises(NotImplementedError):
+            router.add_route('test')
+        with raises(NotImplementedError):
+            router.add_definition('test')
+
     def test_create(self):
         router = routers.ChoiceRouter(routers.DictRouter())
         assert router
         assert repr(router) == '<watson.routing.routers.ChoiceRouter routers:1>'
+        router2 = routers.DictRouter()
+        router.add_router(router2)
+        assert repr(router) == '<watson.routing.routers.ChoiceRouter routers:2>'
 
     def test_get_matched_router(self):
         router = routers.ChoiceRouter(routers.DictRouter())

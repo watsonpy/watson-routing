@@ -155,7 +155,9 @@ class ChoiceRouter(BaseRouter):
     routers = None
 
     def __init__(self, *routers):
-        self.routers = routers
+        self.routers = []
+        for router in routers:
+            self.add_router(router)
 
     def add_route(self, route):
         raise NotImplementedError('Not used in a ChoiceRouter')
