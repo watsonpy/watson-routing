@@ -2,7 +2,7 @@
 import abc
 import collections
 from watson.routing.routes import BaseRoute, LiteralRoute, SegmentRoute
-from watson.common.contextmanagers import ignored
+from watson.common.contextmanagers import suppress
 from watson.common.imports import get_qualified_name
 
 
@@ -33,7 +33,7 @@ class BaseRouter(metaclass=abc.ABCMeta):
         """Converts a route definition into a specific route.
         """
         for strategy in self._build_strategies:
-            with ignored(TypeError):
+            with suppress(TypeError):
                 return strategy(**definition)
         raise Exception(
             'No strategy is capable of building route {0}'.format(definition))
