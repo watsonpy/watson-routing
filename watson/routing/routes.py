@@ -270,7 +270,7 @@ def path_from_segments(segments, params, optional=False):
             path.append(path_from_segments(name, params, optional))
         else:
             if type_ == 'segment':
-                if name in params:
+                if name in params and params[name]:
                     path.append(str(params[name]))
                 elif optional:
                     remove_segments = len(segments) - 1
