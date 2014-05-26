@@ -42,6 +42,20 @@ class TestDictRouter(object):
         assert router.match(request)
         assert not router.match(sample_request(PATH_INFO='/test'))
 
+    def test_match_priority_similar_path(self):
+        router = routers.DictRouter({
+            'page1': {
+                'path': '/page[/:id[/:blah]]',
+            },
+            'page2': {
+                'path': '/page[/:id[/:blah[/:something]]]',
+                'priority': 2
+            }
+        })
+        request = sample_request(PATH_INFO='/page')
+        match = router.match(request)
+        assert match.route.name == 'page2'
+
     def test_no_match_route(self):
         request = sample_request()
         router = routers.DictRouter({

@@ -109,7 +109,7 @@ class BaseRouter(metaclass=abc.ABCMeta):
         if self._requires_sort:
             self._routes = collections.OrderedDict(
                 reversed(sorted(self.routes.items(),
-                         key=lambda r: (r[1].path, r[1].priority))))
+                         key=lambda r: (r[1].priority, r[1].path))))
             self._requires_sort = False
 
     # Internals
