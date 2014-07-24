@@ -31,6 +31,31 @@ class TestDictRouter(object):
         })
         assert len(router) == 2
 
+    def test_add_child_routes_complex(self):
+        router = routers.DictRouter({
+            '1st': {
+                'path': '/home',
+                'children': {
+                    '2nd': {
+                        'path': '/:test',
+                        'requires': {'test': '\w+'},
+                        'children': {
+                            '3rd': {
+                                'path': '/:tada'
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        request = sample_request(PATH_INFO='/home/blah')
+        assert router.match(request).route.name == '1st/2nd'
+        request = sample_request(PATH_INFO='/home/blah/tada')
+        route_match = router.match(request)
+        assert route_match.route.name == '1st/2nd/3rd'
+        assert route_match.route.requires['test'] == '\w+'
+        assert len(router) == 3
+
     def test_match_route(self):
         request = sample_request()
         router = routers.DictRouter({

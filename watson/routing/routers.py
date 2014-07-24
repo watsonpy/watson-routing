@@ -3,6 +3,7 @@ import abc
 import collections
 from watson.routing.routes import BaseRoute, LiteralRoute, SegmentRoute
 from watson.common.contextmanagers import suppress
+from watson.common.datastructures import dict_deep_update
 from watson.common.imports import get_qualified_name
 
 
@@ -124,11 +125,12 @@ class BaseRouter(metaclass=abc.ABCMeta):
                 name, child = child, children[child]
             else:
                 name = child['name']
+            child['requires'] = dict_deep_update(child.get('requires', {}), parent_route.requires)
+            child['defaults'] = dict_deep_update(child.get('defaults', {}), parent_route.requires)
             name = '{0}/{1}'.format(parent_route.name, name)
             child['path'] = '{0}{1}'.format(parent_route.path, child['path'])
             child['name'] = name
-            route = self.add_definition(child)
-            self._create_child_routes(child, route)
+            self.add_definition(child)
 
     def __len__(self):
         return len(self.routes)
