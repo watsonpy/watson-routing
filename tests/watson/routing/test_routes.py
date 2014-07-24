@@ -141,6 +141,10 @@ class TestSegmentRoute(object):
         route = routes.SegmentRoute(name='home', path='/:test')
         optional = routes.SegmentRoute(name='home', path='/about[/:test]')
         optional_nested = routes.SegmentRoute(name='home', path='/about[/:company[/:test]]')
+        requires = routes.SegmentRoute(name='home', path='/about/:company', requires={'company': '\w+'})
+        assert requires.assemble(company='test') == '/about/test'
+        with raises(KeyError):
+            requires.assemble()
         assert route.assemble(test='blah') == '/blah'
         assert route.assemble(
             prefix='http://127.0.0.1', test='blah') == 'http://127.0.0.1/blah'
