@@ -4,14 +4,14 @@ from pytest import raises
 from tests.watson.routing.support import sample_request
 
 
-class TestDictRouter(object):
+class TestDict(object):
     def test_create(self):
-        router = routers.DictRouter()
+        router = routers.Dict()
         assert router
-        assert repr(router) == '<watson.routing.routers.DictRouter routes:0>'
+        assert repr(router) == '<watson.routing.routers.Dict routes:0>'
 
     def test_instantiate_with_routes(self):
-        router = routers.DictRouter({
+        router = routers.Dict({
             'home': {
                 'path': '/'
             }
@@ -19,7 +19,7 @@ class TestDictRouter(object):
         assert len(router) == 1
 
     def test_add_child_routes(self):
-        router = routers.DictRouter({
+        router = routers.Dict({
             'home': {
                 'path': '/',
                 'children': {
@@ -32,7 +32,7 @@ class TestDictRouter(object):
         assert len(router) == 2
 
     def test_add_child_routes_complex(self):
-        router = routers.DictRouter({
+        router = routers.Dict({
             '1st': {
                 'path': '/home',
                 'children': {
@@ -58,7 +58,7 @@ class TestDictRouter(object):
 
     def test_match_route(self):
         request = sample_request()
-        router = routers.DictRouter({
+        router = routers.Dict({
             'home': {
                 'path': '/'
             }
@@ -68,7 +68,7 @@ class TestDictRouter(object):
         assert not router.match(sample_request(PATH_INFO='/test'))
 
     def test_match_priority_similar_path(self):
-        router = routers.DictRouter({
+        router = routers.Dict({
             'page1': {
                 'path': '/page[/:id[/:blah]]',
             },
@@ -83,7 +83,7 @@ class TestDictRouter(object):
 
     def test_no_match_route(self):
         request = sample_request()
-        router = routers.DictRouter({
+        router = routers.Dict({
             'home': {
                 'path': '/about'
             }
@@ -92,7 +92,7 @@ class TestDictRouter(object):
             next(router.matches(request))
 
     def test_assemble(self):
-        router = routers.DictRouter({
+        router = routers.Dict({
             'home': {
                 'path': '/'
             }
@@ -102,25 +102,25 @@ class TestDictRouter(object):
             router.assemble('no_route')
 
 
-class TestListRouter(object):
+class TestList(object):
     def test_create(self):
-        router = routers.ListRouter()
+        router = routers.List()
         assert router
 
     def test_instantiate_with_routes(self):
-        router = routers.ListRouter([
+        router = routers.List([
             {'name': 'home', 'path': '/'}
         ])
         assert len(router) == 1
 
     def test_invalid_route(self):
         with raises(Exception):
-            routers.ListRouter([
+            routers.List([
                 {'invalid': 'home', 'path': '/'}
             ])
 
     def test_multiple_priorities(self):
-        router = routers.ListRouter([
+        router = routers.List([
             {'name': 'about', 'path': '/about'},
             {'name': 'home', 'path': '/'},
         ])
@@ -128,7 +128,7 @@ class TestListRouter(object):
         assert list(router.routes.items())[0][0] == 'about'
 
     def test_add_child_routes(self):
-        router = routers.ListRouter([
+        router = routers.List([
             {
                 'name': 'home',
                 'path': '/',
@@ -140,49 +140,49 @@ class TestListRouter(object):
         assert len(router) == 2
 
 
-class TestChoiceRouter(object):
+class TestChoice(object):
 
     def test_invalid(self):
-        router = routers.ChoiceRouter()
+        router = routers.Choice()
         with raises(NotImplementedError):
             router.add_route('test')
         with raises(NotImplementedError):
             router.add_definition('test')
 
     def test_create(self):
-        router = routers.ChoiceRouter(routers.DictRouter())
+        router = routers.Choice(routers.Dict())
         assert router
-        assert repr(router) == '<watson.routing.routers.ChoiceRouter routers:1>'
-        router2 = routers.DictRouter()
+        assert repr(router) == '<watson.routing.routers.Choice routers:1>'
+        router2 = routers.Dict()
         router.add_router(router2)
-        assert repr(router) == '<watson.routing.routers.ChoiceRouter routers:2>'
+        assert repr(router) == '<watson.routing.routers.Choice routers:2>'
 
     def test_get_matched_router(self):
-        router = routers.ChoiceRouter(routers.DictRouter())
-        assert router[routers.DictRouter]
+        router = routers.Choice(routers.Dict())
+        assert router[routers.Dict]
         assert not router['blah']
 
     def test_match_route(self):
         request = sample_request(PATH_INFO='/list')
-        dict_router = routers.DictRouter({
+        dict_router = routers.Dict({
             'dict': {
                 'path': '/dict',
             }
         })
-        list_router = routers.ListRouter([
+        list_router = routers.List([
             {'name': 'list', 'path': '/list'}
         ])
-        router = routers.ChoiceRouter(dict_router, list_router)
+        router = routers.Choice(dict_router, list_router)
         match = router.match(request)
         assert match.route.name == 'list'
         assert len(router) == 2
         assert not router.match(sample_request(PATH_INFO='/test'))
 
     def test_assemble(self):
-        list_router = routers.ListRouter([
+        list_router = routers.List([
             {'name': 'list', 'path': '/list'}
         ])
-        router = routers.ChoiceRouter(list_router)
+        router = routers.Choice(list_router)
         assert router.assemble('list') == '/list'
         with raises(KeyError):
             router.assemble('invalid')

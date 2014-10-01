@@ -7,7 +7,7 @@ from watson.common.datastructures import dict_deep_update
 from watson.common.imports import get_qualified_name
 
 
-class BaseRouter(metaclass=abc.ABCMeta):
+class Base(metaclass=abc.ABCMeta):
 
     """Responsible for maintaining a list of routes.
 
@@ -150,7 +150,7 @@ class BaseRouter(metaclass=abc.ABCMeta):
         )
 
 
-class ChoiceRouter(BaseRouter):
+class Choice(Base):
     """Search for a match to a route from multiple routers.
     """
 
@@ -159,13 +159,14 @@ class ChoiceRouter(BaseRouter):
     def __init__(self, *routers):
         self.routers = []
         for router in routers:
-            self.add_router(router)
+            if isinstance(router, Base):
+                self.add_router(router)
 
     def add_route(self, route):
-        raise NotImplementedError('Not used in a ChoiceRouter')
+        raise NotImplementedError('Not used in a Choice router')
 
     def add_definition(self, definition):
-        raise NotImplementedError('Not used in a ChoiceRouter')
+        raise NotImplementedError('Not used in a Choice router')
 
     def add_router(self, router):
         """Adds another router type to be able to search through.
@@ -199,7 +200,7 @@ class ChoiceRouter(BaseRouter):
         return None
 
     def assemble(self, route_name, **kwargs):
-        """See: BaseRouter.assemble
+        """See: Base.assemble
         """
         for router in self:
             if route_name in router:
@@ -215,8 +216,8 @@ class ChoiceRouter(BaseRouter):
 
             .. code-block: python
 
-            router = routers.ChoiceRouter(routers.DictRouter())
-            dict_router = routers[routers.DictRouter]
+            router = routers.Choice(routers.Dict())
+            dict_router = routers[routers.Dict]
         """
         for router in self:
             if router.__class__ is class_:
@@ -242,14 +243,14 @@ class ChoiceRouter(BaseRouter):
         )
 
 
-class ListRouter(BaseRouter):
+class List(Base):
     """Creates routes from a list of routes.
 
     Priority will automatically be assigned based upon the order of the route
     definitions in the list.
     """
     def __init__(self, routes=None, build_strategies=None):
-        super(ListRouter, self).__init__(routes, build_strategies)
+        super(List, self).__init__(routes, build_strategies)
         if not routes:
             routes = []
         for priority, route_definition in enumerate(routes):
@@ -261,11 +262,11 @@ class ListRouter(BaseRouter):
         self.sort()
 
 
-class DictRouter(BaseRouter):
+class Dict(Base):
     """Create routes from a dictionary of route definitions.
     """
     def __init__(self, routes=None, build_strategies=None):
-        super(DictRouter, self).__init__(routes, build_strategies)
+        super(Dict, self).__init__(routes, build_strategies)
         if not routes:
             routes = {}
         for name, route_definition in routes.items():
@@ -274,3 +275,9 @@ class DictRouter(BaseRouter):
                 route_definition['name'] = name
                 self.add_definition(route_definition)
         self.sort()
+
+# Deprecated, will be removed in the next major version
+
+ListRouter = List
+DictRouter = Dict
+ChoiceRouter = Choice

@@ -5,9 +5,9 @@ from watson.http import REQUEST_METHODS
 from watson.routing import routes
 
 
-class TestBaseRoute(object):
+class TestBase(object):
     def test_properties(self):
-        class MyRoute(routes.BaseRoute):
+        class MyRoute(routes.Base):
             pass
 
         with raises(NotImplementedError):
@@ -25,29 +25,29 @@ class TestBaseRoute(object):
             route.assemble()
 
 
-class TestLiteralRoute(object):
+class TestLiteral(object):
     def test_create(self):
-        route = routes.LiteralRoute(name='home', path='/', accepts=('GET',))
+        route = routes.Literal(name='home', path='/', accepts=('GET',))
         assert route
         assert route.accepts == ('GET',)
-        assert repr(route) == '<watson.routing.routes.LiteralRoute name:home path:/>'
+        assert repr(route) == '<watson.routing.routes.Literal name:home path:/>'
 
     def test_match(self):
-        route = routes.LiteralRoute(name='home', path='/')
+        route = routes.Literal(name='home', path='/')
         assert route.match(support.sample_request())
 
     def test_no_accept_match(self):
-        route = routes.LiteralRoute(name='home', path='/', accepts=('POST',))
+        route = routes.Literal(name='home', path='/', accepts=('POST',))
         assert not route.match(support.sample_request())
 
     def test_accept_match(self):
-        route = routes.LiteralRoute(name='home', path='/', accepts=('POST',))
+        route = routes.Literal(name='home', path='/', accepts=('POST',))
         assert route.match(support.sample_request(REQUEST_METHOD='POST'))
 
     def test_no_subdomain_match(self):
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'subdomain': 'test'})
-        route2 = routes.LiteralRoute(
+        route2 = routes.Literal(
             name='home', path='/', requires={'subdomain': ('test',)})
         request = support.sample_request()
         assert not route.match(request)
@@ -56,69 +56,69 @@ class TestLiteralRoute(object):
     def test_subdomain_match(self):
         request = support.sample_request(SERVER_NAME='clients2.test.com',
                                          HTTP_HOST='clients2.test.com')
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'subdomain': 'clients2'})
         assert route.match(request)
 
     def test_format_match(self):
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'format': 'xml'})
         assert route.match(support.sample_request(HTTP_ACCEPT='text/xml'))
 
     def test_no_format_match(self):
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'format': 'xml'})
         assert not route.match(support.sample_request(HTTP_ACCEPT='text/json'))
 
     def test_get_match(self):
         request = support.sample_request(QUERY_STRING='test=blah')
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'test': '^blah'})
         assert route.match(request)
 
     def test_no_get_match(self):
         request = support.sample_request(QUERY_STRING='test=test')
-        route = routes.LiteralRoute(
+        route = routes.Literal(
             name='home', path='/', requires={'test': 'blah'})
         match = route.match(request)
         assert not match
 
     def test_assemble(self):
-        route = routes.LiteralRoute(name='home', path='/')
+        route = routes.Literal(name='home', path='/')
         assert route.assemble() == '/'
         assert route.assemble(prefix='http://127.0.0.1') == 'http://127.0.0.1/'
 
 
-class TestSegmentRoute(object):
+class TestSegment(object):
     def test_create(self):
-        route = routes.SegmentRoute(name='home', path='/')
+        route = routes.Segment(name='home', path='/')
         assert route
-        assert repr(route) == '<watson.routing.routes.SegmentRoute name:home path:/ match:\/$>'
+        assert repr(route) == '<watson.routing.routes.Segment name:home path:/ match:\/$>'
 
     def test_create_regex_instead_of_path(self):
         with raises(TypeError):
-            routes.SegmentRoute(name='home')
-        route = routes.SegmentRoute(name='home', regex='/test')
+            routes.Segment(name='home')
+        route = routes.Segment(name='home', regex='/test')
         assert route
-        assert repr(route) == '<watson.routing.routes.SegmentRoute name:home match:\/test$>'
+        assert repr(route) == '<watson.routing.routes.Segment name:home match:\/test$>'
 
     def test_builder(self):
-        assert routes.SegmentRoute.builder(name='test', path='/:test')
+        assert routes.Segment.builder(name='test', path='/:test')
 
     def test_match(self):
-        route = routes.SegmentRoute(name='home', path='/:test')
+        route = routes.Segment(name='home', path='/:test')
         assert route.match(support.sample_request(PATH_INFO='/blah'))
 
     def test_no_match(self):
-        route = routes.SegmentRoute(name='home', path='/:test', accepts=('GET',))
+        route = routes.Segment(name='home', path='/:test', accepts=('GET',))
         assert not route.match(support.sample_request(PATH_INFO='/'))
         assert not route.match(
             support.sample_request(PATH_INFO='/test', REQUEST_METHOD='POST'))
 
     def test_optional_match(self):
-        optional = routes.SegmentRoute(name='home', path='/about[/:company]')
-        optional_nested = routes.SegmentRoute(name='home', path='/about[/:company[/:test]]')
-        optional_required = routes.SegmentRoute(name='home', path='/about[/:company/:test]')
+        optional = routes.Segment(name='home', path='/about[/:company]')
+        optional_nested = routes.Segment(name='home', path='/about[/:company[/:test]]')
+        optional_required = routes.Segment(name='home', path='/about[/:company/:test]')
         request = support.sample_request(PATH_INFO='/about/test')
         request2 = support.sample_request(PATH_INFO='/about/test')
         request3 = support.sample_request(PATH_INFO='/about/test/blah')
@@ -129,19 +129,19 @@ class TestSegmentRoute(object):
         assert not optional_required.match(request2)
 
     def test_optional_params(self):
-        route = routes.SegmentRoute(name='home', path='/about[/:company]', defaults={'company': 'test'})
+        route = routes.Segment(name='home', path='/about[/:company]', defaults={'company': 'test'})
         request = support.sample_request(PATH_INFO='/about')
         assert route.match(request).params['company'] == 'test'
 
     def test_segment_bracket_mismatch(self):
         with raises(ValueError):
-            routes.SegmentRoute(name='mismatch', path='/search:keyword]')
+            routes.Segment(name='mismatch', path='/search:keyword]')
 
     def test_assemble(self):
-        route = routes.SegmentRoute(name='home', path='/:test')
-        optional = routes.SegmentRoute(name='home', path='/about[/:test]')
-        optional_nested = routes.SegmentRoute(name='home', path='/about[/:company[/:test]]')
-        requires = routes.SegmentRoute(name='home', path='/about/:company', requires={'company': '\w+'})
+        route = routes.Segment(name='home', path='/:test')
+        optional = routes.Segment(name='home', path='/about[/:test]')
+        optional_nested = routes.Segment(name='home', path='/about[/:company[/:test]]')
+        requires = routes.Segment(name='home', path='/about/:company', requires={'company': '\w+'})
         assert requires.assemble(company='test') == '/about/test'
         with raises(KeyError):
             requires.assemble()

@@ -5,14 +5,14 @@ import re
 from watson.http import REQUEST_METHODS, MIME_TYPES
 from watson.common.imports import get_qualified_name
 
-__all__ = ('BaseRoute', 'LiteralRoute', 'SegmentRoute', 'RouteMatch')
+__all__ = ('Base', 'Literal', 'Segment', 'RouteMatch')
 
 # route: The matched route
 # params: The parameters that have been matched
 RouteMatch = collections.namedtuple('RouteMatch', 'route params')
 
 
-class BaseRoute(metaclass=abc.ABCMeta):
+class Base(metaclass=abc.ABCMeta):
     """Matches a request to a specific pattern.
 
     The only required attribute of a route is the 'path' key. This defines the
@@ -282,7 +282,7 @@ def path_from_segments(segments, params, optional=False):
     return ''.join(path)
 
 
-class SegmentRoute(BaseRoute):
+class Segment(Base):
     """Matches a request against a regular expression.
 
     Attributes:
@@ -314,7 +314,7 @@ class SegmentRoute(BaseRoute):
         if not path and not regex:
             raise TypeError(
                 'You must specify either path or regex for the route named {0}'.format(name))
-        super(SegmentRoute, self).__init__(
+        super(Segment, self).__init__(
             name, path,
             accepts, requires, defaults, options, priority, **kwargs)
         self.regex = regex if regex else path
@@ -336,7 +336,7 @@ class SegmentRoute(BaseRoute):
         return prefix + path if prefix else path
 
     def match(self, request):
-        params = super(SegmentRoute, self).match(request)
+        params = super(Segment, self).match(request)
         if params is None:
             return None
         matches = self.regex.match(request.environ.get('PATH_INFO'))
@@ -354,7 +354,7 @@ class SegmentRoute(BaseRoute):
                 or ('path' in definition
                     and any((c in {'[', ':'}) for c in definition['path']))):
             return cls(**definition)
-        raise TypeError('Not a valid SegmentRoute')
+        raise TypeError('Not a valid Segment')
 
     def __repr__(self):
         class_ = get_qualified_name(self)
@@ -374,7 +374,7 @@ class SegmentRoute(BaseRoute):
         )
 
 
-class LiteralRoute(BaseRoute):
+class Literal(Base):
     """Matches a request against a literal path.
 
     A literal path is classified as /example/path where there are no dynamic
@@ -390,13 +390,13 @@ class LiteralRoute(BaseRoute):
 
         .. code-block:: python
 
-            route = LiteralRoute('search', path='/search/:keyword')
+            route = Literal('search', path='/search/:keyword')
             route.assemble(keyword='test')  # /search/test
         """
         return prefix + self.path if prefix else self.path
 
     def match(self, request):
-        params = super(LiteralRoute, self).match(request)
+        params = super(Literal, self).match(request)
         if params is not None and request.environ['PATH_INFO'] == self.path:
             return RouteMatch(self, params=params)
         return None
@@ -404,3 +404,9 @@ class LiteralRoute(BaseRoute):
     @classmethod
     def builder(cls, **definition):
         return cls(**definition)
+
+# Deprecated, will be removed in the next major version
+
+BaseRoute = Base
+LiteralRoute = Literal
+SegmentRoute = Segment

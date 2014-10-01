@@ -1,0 +1,4 @@
+1.0.7
+
+- Resolved issue with ChoiceRouter adding non-routers to the router list
+- Route/Router suffix now deprecated, should be using from watson.routing import routes, routes.Segment etc
