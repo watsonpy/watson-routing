@@ -128,6 +128,8 @@ class Base(metaclass=abc.ABCMeta):
             child['requires'] = dict_deep_update(child.get('requires', {}), parent_route.requires)
             child['defaults'] = dict_deep_update(child.get('defaults', {}), parent_route.requires)
             name = '{0}/{1}'.format(parent_route.name, name)
+            if 'path' not in child:
+                child['path'] = '/{}'.format(name)
             child['path'] = '{0}{1}'.format(parent_route.path, child['path'])
             child['name'] = name
             self.add_definition(child)

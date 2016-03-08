@@ -4,7 +4,7 @@ Watson-Routing
 Process and route HTTP Request messages.
 
 For full documentation please see `Read The
-Docs <http://watson-http.readthedocs.org/>`__.
+Docs <http://watson-routing.readthedocs.org/>`__.
 
 Build Status
 ^^^^^^^^^^^^
