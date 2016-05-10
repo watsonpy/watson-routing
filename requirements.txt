@@ -1,1 +1,1 @@
-watson-http >= 1.1.3
+watson-http >= 1.2.3
