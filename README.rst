@@ -25,9 +25,5 @@ Dependencies
    :target: https://travis-ci.org/watsonpy/watson-routing
 .. |Coverage Status| image:: https://coveralls.io/repos/watsonpy/watson-routing/badge.png
    :target: https://coveralls.io/r/watsonpy/watson-routing
-.. |Version| image:: http://badge.kloud51.com/pypi/v/watson-routing.png
-   :target: https://pypi.python.org/pypi/watson-routing/
-.. |Downloads| image:: http://badge.kloud51.com/pypi/d/watson-routing.png
-   :target: https://pypi.python.org/pypi/watson-routing/
-.. |Licence| image:: http://badge.kloud51.com/pypi/license/watson-routing.png
+.. |Version| image:: https://img.shields.io/pypi/v/watson-routing.svg?maxAge=2592000
    :target: https://pypi.python.org/pypi/watson-routing/
