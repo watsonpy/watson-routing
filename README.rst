@@ -9,7 +9,7 @@ Docs <http://watson-routing.readthedocs.org/>`__.
 Build Status
 ^^^^^^^^^^^^
 
-|Build Status| |Coverage Status| |Version| |Downloads| |Licence|
+|Build Status| |Coverage Status| |Version|
 
 Installation
 ------------
@@ -21,9 +21,9 @@ Dependencies
 
 -  watson-common
 
-.. |Build Status| image:: https://api.travis-ci.org/watsonpy/watson-routing.png?branch=master
+.. |Build Status| image:: https://img.shields.io/travis/watsonpy/watson-routing.svg?maxAge=2592000
    :target: https://travis-ci.org/watsonpy/watson-routing
-.. |Coverage Status| image:: https://coveralls.io/repos/watsonpy/watson-routing/badge.png
+.. |Coverage Status| image:: https://img.shields.io/coveralls/watsonpy/watson-routing.svg?maxAge=2592000
    :target: https://coveralls.io/r/watsonpy/watson-routing
 .. |Version| image:: https://img.shields.io/pypi/v/watson-routing.svg?maxAge=2592000
    :target: https://pypi.python.org/pypi/watson-routing/
