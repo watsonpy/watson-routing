@@ -1,3 +1,7 @@
+1.2.0
+
+- router.assemble() now accepts a 'query_string' dict in order to append query strings to the url
+
 1.0.7
 
 - Resolved issue with ChoiceRouter adding non-routers to the router list

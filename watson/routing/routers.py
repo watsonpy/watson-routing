@@ -81,7 +81,9 @@ class Base(metaclass=abc.ABCMeta):
             KeyError if the route does not exist on the router.
         """
         if route_name in self:
-            return self.routes[route_name].assemble(**kwargs)
+            query_string = self._extract_query_string(
+                **kwargs.get('query_string', {}))
+            return self.routes[route_name].assemble(**kwargs) + query_string
         else:
             raise KeyError(
                 'No route named {0} can be found.'.format(route_name))
@@ -117,6 +119,12 @@ class Base(metaclass=abc.ABCMeta):
 
     def __contains__(self, route_name):
         return route_name in self.routes
+
+    def _extract_query_string(self, **kwargs):
+        parts = ['{}={}'.format(key, value) for key, value in kwargs.items()]
+        if parts:
+            return '?{}'.format('&amp;'.join(parts))
+        return ''
 
     def _create_child_routes(self, definition, parent_route):
         children = definition.get('children', ())
@@ -206,7 +214,9 @@ class Choice(Base):
         """
         for router in self:
             if route_name in router:
-                return router.routes[route_name].assemble(**kwargs)
+                query_string = self._extract_query_string(
+                    **kwargs.get('query_string', {}))
+                return router.routes[route_name].assemble(**kwargs) + query_string
         raise KeyError('No route named {0} can be found.'.format(route_name))
 
     # Internals
