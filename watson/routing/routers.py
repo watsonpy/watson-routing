@@ -192,7 +192,7 @@ class Choice(Base):
         Returns:
             A list of RouteMatch namedtuples.
         """
-        for router in self:
+        for router in self.routers:
             for route_match in router.matches(request):
                 yield route_match
 
@@ -212,7 +212,7 @@ class Choice(Base):
     def assemble(self, route_name, **kwargs):
         """See: Base.assemble
         """
-        for router in self:
+        for router in self.routers:
             if route_name in router:
                 query_string = self._extract_query_string(
                     **kwargs.get('query_string', {}))
@@ -231,26 +231,28 @@ class Choice(Base):
             router = routers.Choice(routers.Dict())
             dict_router = routers[routers.Dict]
         """
-        for router in self:
+        for router in self.routers:
             if router.__class__ is class_:
                 return router
         return None
 
-    def __len__(self):
-        return len(self.routers)
-
     def __bool__(self):
         return True
+
+    def __len__(self):
+        return len([(name, route) for name, route in self])
 
     def __iter__(self):
         for router in self.routers:
             if router:
-                yield router
+                for name, route in router.routes.items():
+                    yield name, route
 
     def __repr__(self):
         return (
-            '<{0} routers:{1}>'.format(
+            '<{0} routers:{1} routes:{2}>'.format(
                 get_qualified_name(self),
+                len(self.routers),
                 len(self))
         )
 

@@ -152,10 +152,10 @@ class TestChoice(object):
     def test_create(self):
         router = routers.Choice(routers.Dict())
         assert router
-        assert repr(router) == '<watson.routing.routers.Choice routers:1>'
+        assert repr(router) == '<watson.routing.routers.Choice routers:1 routes:0>'
         router2 = routers.Dict()
         router.add_router(router2)
-        assert repr(router) == '<watson.routing.routers.Choice routers:2>'
+        assert repr(router) == '<watson.routing.routers.Choice routers:2 routes:0>'
 
     def test_get_matched_router(self):
         router = routers.Choice(routers.Dict())
