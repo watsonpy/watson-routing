@@ -228,7 +228,7 @@ def segments_from_path(path):
     return segments
 
 
-def regex_from_segments(segments, requires=None):
+def regex_from_segments(segments, requires=None, escape_segment=True):
     """Converts a list of segment tuple pairs into a regular expression string.
 
     Args:
@@ -241,7 +241,9 @@ def regex_from_segments(segments, requires=None):
     regex = []
     for type_, value in segments:
         if type_ == 'static':
-            regex.append(re.escape(value))
+            if escape_segment:
+                value = re.escape(value)
+            regex.append(value)
         elif type_ == 'optional':
             regex.append(
                 optional_segment_string.format(
@@ -299,8 +301,10 @@ class Segment(Base):
     @regex.setter
     def regex(self, regex):
         if isinstance(regex, str):
+            escape = regex.startswith('/')
             self._segments = segments_from_path(regex)
-            regex_string = regex_from_segments(self.segments, self.requires)
+            regex_string = regex_from_segments(
+                self.segments, self.requires, escape_segment=escape)
             regex = re.compile(regex_string)
         self._regex = regex
 

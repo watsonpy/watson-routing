@@ -287,7 +287,7 @@ class Dict(Base):
             is_route = isinstance(route_definition, BaseRoute)
             if not is_route:
                 route_definition['name'] = name
-                if 'path' not in route_definition:
+                if 'path' not in route_definition and 'regex' not in route_definition:
                     route_definition['path'] = '/{}'.format(name)
                 self.add_definition(route_definition)
         self.sort()

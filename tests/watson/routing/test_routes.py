@@ -102,6 +102,10 @@ class TestSegment(object):
         assert route
         assert repr(route) == '<watson.routing.routes.Segment name:home match:\/test$>'
 
+    def test_match_regex(self):
+        route = routes.Segment(name='wildcard', regex='^/.*')
+        assert route.match(support.sample_request(PATH_INFO='/test'))
+
     def test_builder(self):
         assert routes.Segment.builder(name='test', path='/:test')
 
