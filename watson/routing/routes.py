@@ -88,6 +88,10 @@ class Base(metaclass=abc.ABCMeta):
     def priority(self):
         return int(self._priority) or 1
 
+    @property
+    def path_or_regex(self):
+        return self.path if self.path else self.regex
+
     def __init__(self, name, path,
                  accepts=None, requires=None, defaults=None, options=None,
                  priority=1, **kwargs):
