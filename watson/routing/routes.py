@@ -134,7 +134,7 @@ class Base(metaclass=abc.ABCMeta):
         """
         params = self.defaults.copy()
         requires = self.requires.copy()
-        if not request.method in self._accepts:
+        if request.method not in self._accepts:
             return None
         if 'subdomain' in self.requires:
             del requires['subdomain']
@@ -173,8 +173,9 @@ class Base(metaclass=abc.ABCMeta):
                 self.path)
         )
 
-segments_pattern = re.compile('(?P<static>[^:\[\]]*)(?P<token>[:\[\]]|$)')
-token_pattern = re.compile('(?P<name>[^:/\[\]]+)')
+
+segments_pattern = re.compile(r'(?P<static>[^:\[\]]*)(?P<token>[:\[\]]|$)')
+token_pattern = re.compile(r'(?P<name>[^:/\[\]]+)')
 optional_segment_string = '(?:{value})?'
 value_pattern_string = '(?P<{value}>{end})'
 end_pattern_string = '[^/]+'
@@ -359,8 +360,8 @@ class Segment(Base):
     @classmethod
     def builder(cls, **definition):
         if ('regex' in definition
-                or ('path' in definition
-                    and any((c in {'[', ':'}) for c in definition['path']))):
+                or ('path' in definition  # noqa
+                    and any((c in {'[', ':'}) for c in definition['path']))):  # noqa
             return cls(**definition)
         raise TypeError('Not a valid Segment')
 
@@ -412,6 +413,7 @@ class Literal(Base):
     @classmethod
     def builder(cls, **definition):
         return cls(**definition)
+
 
 # Deprecated, will be removed in the next major version
 

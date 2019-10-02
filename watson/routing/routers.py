@@ -292,6 +292,7 @@ class Dict(Base):
                 self.add_definition(route_definition)
         self.sort()
 
+
 # Deprecated, will be removed in the next major version
 
 ListRouter = List
