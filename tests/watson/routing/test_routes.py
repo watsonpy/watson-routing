@@ -93,14 +93,14 @@ class TestSegment(object):
     def test_create(self):
         route = routes.Segment(name='home', path='/')
         assert route
-        assert repr(route) == '<watson.routing.routes.Segment name:home path:/ match:\/$>'
+        assert repr(route) == '<watson.routing.routes.Segment name:home path:/ match:/$>'
 
     def test_create_regex_instead_of_path(self):
         with raises(TypeError):
             routes.Segment(name='home')
         route = routes.Segment(name='home', regex='/test')
         assert route
-        assert repr(route) == '<watson.routing.routes.Segment name:home match:\/test$>'
+        assert repr(route) == '<watson.routing.routes.Segment name:home match:/test$>'
 
     def test_match_regex(self):
         route = routes.Segment(name='wildcard', regex='^/.*')
@@ -145,7 +145,7 @@ class TestSegment(object):
         route = routes.Segment(name='home', path='/:test')
         optional = routes.Segment(name='home', path='/about[/:test]')
         optional_nested = routes.Segment(name='home', path='/about[/:company[/:test]]')
-        requires = routes.Segment(name='home', path='/about/:company', requires={'company': '\w+'})
+        requires = routes.Segment(name='home', path='/about/:company', requires={'company': 'w+'})
         assert requires.assemble(company='test') == '/about/test'
         with raises(KeyError):
             requires.assemble()
